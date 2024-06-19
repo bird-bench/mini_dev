@@ -278,7 +278,7 @@ We extend our sincere gratitude to the invaluable feedbacks from the open commun
 
 For any questions, please contact us by bird.bench23@gmail.com.
 
-## My To-Do List  
+## To-Do List  
   
 - [x] Release BIRD MINI DEV
 - [ ] Implement [`TA-SQL`](https://github.com/quge2023/TA-SQL) as ICL Reasoning Baseline.
