@@ -11,7 +11,7 @@
 
 
 [![License](https://img.shields.io/badge/License-CC%20BY%20SA%204.0-orange.svg)](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
-[![Data Link](https://img.shields.io/badge/Download-MiniDev-green.svg)](https://drive.google.com/file/d/1UJyA6I6pTmmhYpwdn8iT9QKrcJqSQAcX/view?usp=sharing)
+[![Data Link](https://img.shields.io/badge/Download-MiniDev-green.svg)](https://bird-bench.oss-cn-beijing.aliyuncs.com/minidev.zip)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-teal.svg)](https://www.python.org/downloads/)
 [![Leaderboard 1.8+](https://img.shields.io/badge/Leaderboard-2023-pink.svg)](https://bird-bench.github.io/)
 [![OpenAI 1.30+](https://img.shields.io/badge/OpenAI-1.30+-beige.svg)](https://pypi.org/project/openai/)
