@@ -221,6 +221,7 @@ The soft F1-score is calculated as follows:
 * F1 = 2 * Precision * Recall / (Precision + Recall) = 0.8
 
 ## Baseline performance on Mini-Dev Dataset
+
 ###  EX Evaluation
 |                        | SQLite | MySQL | PostgreSQL |
 |------------------------|:------:|:-----:|:----------:|
@@ -230,9 +231,13 @@ The soft F1-score is calculated as follows:
 | **gpt-35-turbo-instruct** | 33.60  | 31.20 | 26.60      |
 | **gpt-35-turbo**       | 38.00  | 36.00 | 27.40      |
 | **llama3-70b-instruct**         | 40.80  | 37.00 | 29.40      |
+| **TA + gpt-35-turbo**       | 41.60  | - | -      |
+| **TA + llama3-70b-instruct**  | 42.80 | -    |-     |
 | **gpt-4-turbo**        | 45.80  | 41.00 | 36.00      |
 | **gpt-4-32k**        | 47.00  | 43.20 | 35.00       |
 | **gpt-4**        | 47.80  | 40.80 | 35.80      |
+| **TA + gpt-4-turbo**        | 58.00  | - | -      |
+| **TA + gpt-4-o**        | 63.00  | - | -      |
 
 
 ### R-VES Evaluation
@@ -244,9 +249,13 @@ The soft F1-score is calculated as follows:
 | **gpt-35-turbo-instruct** | 32.28  | 30.39 | 26.14      |
 | **gpt-35-turbo**       | 37.33  | 34.94 | 26.80      |
 | **llama3-70b-instruct**         | 39.02  | 35.82 | 28.80      |
+| **TA + gpt-35-turbo**       | 40.59  | - | -      |
+| **TA + llama3-70b-instruct**  | 41.37 | -    | -      |
 | **gpt-4-turbo**        | 44.79  | 39.37 | 35.23      |
 | **gpt-4-32k**        | 45.29  | 42.79 | 34.59     |
 | **gpt-4**        | 45.91  | 39.92 | 35.24       |
+| **TA + gpt-4-turbo**        | 56.44   | - | -      |
+| **TA + gpt-4-o**        | 60.86  | - | -      |
 
 
 ### Soft F1-Score Evaluation
@@ -257,10 +266,14 @@ The soft F1-score is calculated as follows:
 |**phi-3-medium-128k-instruct**                | 35.33 | 28.73  | 24.11  |
 | **gpt-35-turbo-instruct** | 36.34  | 33.85 | 28.30      |
 | **gpt-35-turbo**       | 41.84  | 40.75 | 30.22      |
+| **TA + gpt-35-turbo**       | 44.25  | - | -      |
 | **llama3-70b-instruct**         | 44.38  | 40.95 | 31.43      |
+| **TA + llama3-70b-instruct**  | 46.66 | -    | -      |
 | **gpt-4-turbo**        | 50.08  | 45.96 | 38.36      |
 | **gpt-4-32k**        | 51.92  | 47.38 | 39.55      |
 | **gpt-4**        | 52.69 | 45.78 | 38.96       |
+| **TA + gpt-4-turbo**        | 62.40   | - | -      |
+| **TA + gpt-4-o**        | 66.97  | - | -      |
 
 ### Predict SQLs
 We drop the predicted SQLs of baseline models under `./llm/exp_result/sql_output_kg/` for reference.
@@ -271,6 +284,8 @@ We drop the predicted SQLs of baseline models under `./llm/exp_result/sql_output
 </p>
 
 
+
+
 ## Acknowledgement
 Main contributors to the Mini-Dev project: Xiaolong Li, Jinyang Li, Ge Qu, Binyuan Hui, Reynold Cheng, Chenhao Ma.
 
@@ -278,10 +293,10 @@ We extend our sincere gratitude to the invaluable feedbacks from the open commun
 
 For any questions, please contact us by bird.bench23@gmail.com.
 
-## To-Do List  
+## My To-Do List  
   
 - [x] Release BIRD MINI DEV
-- [ ] Implement [`TA-SQL`](https://github.com/quge2023/TA-SQL) as ICL Reasoning Baseline.
+- [x] Implement [`TA-SQL`](https://github.com/quge2023/TA-SQL) as ICL Reasoning Baseline.
 - [ ] Implement more open-source LLMs.
 - [ ] Release cleaner dev.json.
 - [ ] Release cleaner train.json.
