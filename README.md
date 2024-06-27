@@ -210,8 +210,8 @@ The soft F1-score is calculated as follows:
 |  | Matched| Pred_only | Gold_only  |
 |----------|:----------:|:----------:|:----------:|
 | **Row 1** | 2 | 0 | 0 | 
-| **Row 2** | 1 | 0 | 1 | 
-| **Row 3** | 1 | 1 | 0 | 
+| **Row 2** | 1 | 1 | 0 | 
+| **Row 3** | 1 | 0 | 1 | 
 
 * tp = SUM(Matched) = 4 
 * fp = SUM(Pred_only) = 1
