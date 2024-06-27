@@ -237,7 +237,7 @@ The soft F1-score is calculated as follows:
 | **gpt-4-32k**        | 47.00  | 43.20 | 35.00       |
 | **gpt-4**        | 47.80  | 40.80 | 35.80      |
 | **TA + gpt-4-turbo**        | 58.00  | - | -      |
-| **TA + gpt-4-o**        | 63.00  | - | -      |
+| **TA + gpt-4o**        | 63.00  | - | -      |
 
 
 ### R-VES Evaluation
@@ -255,7 +255,7 @@ The soft F1-score is calculated as follows:
 | **gpt-4-32k**        | 45.29  | 42.79 | 34.59     |
 | **gpt-4**        | 45.91  | 39.92 | 35.24       |
 | **TA + gpt-4-turbo**        | 56.44   | - | -      |
-| **TA + gpt-4-o**        | 60.86  | - | -      |
+| **TA + gpt-4o**        | 60.86  | - | -      |
 
 
 ### Soft F1-Score Evaluation
@@ -273,7 +273,7 @@ The soft F1-score is calculated as follows:
 | **gpt-4-32k**        | 51.92  | 47.38 | 39.55      |
 | **gpt-4**        | 52.69 | 45.78 | 38.96       |
 | **TA + gpt-4-turbo**        | 62.40   | - | -      |
-| **TA + gpt-4-o**        | 66.97  | - | -      |
+| **TA + gpt-4o**        | 66.97  | - | -      |
 
 ### Predict SQLs
 We drop the predicted SQLs of baseline models under `./llm/exp_result/sql_output_kg/` for reference.
