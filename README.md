@@ -201,9 +201,9 @@ Ground truth SQL resulted table:
 Predicted SQL resulted table:
 | Row |  | |  
 |:----------:|:----------:|:----------:|
-| 1 | 'Apple' | 325 | 
-| 2  | 'Orange' | 191 | 
-| 3|  | 'Banana' |
+| 1 | 325 |'Apple' |  
+| 2  | 191 |'Orange' |  
+| 3| |'Banana' |
 
 The soft F1-score is calculated as follows:
 
