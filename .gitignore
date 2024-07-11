@@ -1,0 +1,30 @@
+# ignore procedurally generated cache
+**/.mypy_cache
+**/.pytest_cache
+**/.coverage
+
+# ignore errant tool configs
+**/.idea
+**/.DS_Store
+
+# ignore build
+dist
+
+# ignore temporary working files
+local_files/**
+
+# ignore all files in cache
+cache/**
+
+**/__pycache__
+
+.streamlit/secrets.toml
+
+.python-version
+poetry.toml
+
+service_account.json
+*venv/
+
+# Files here are massive - each should copy them in manually
+**/dev_databases/**
