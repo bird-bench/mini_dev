@@ -59,10 +59,17 @@ def execute_sql(predicted_sql, ground_truth, db_path, sql_dialect, calculate_fun
 
 
 def package_sqls(
-    sql_path, db_root_path, engine, sql_dialect="SQLite", mode="gpt", data_mode="dev"
+    sql_path, db_root_path, engine, sql_dialect="SQLite", mode="gpt", data_mode="dev", filter_file=""
 ):
     clean_sqls = []
     db_path_list = []
+
+    # Load filter flags if filter_file is provided
+    filter_flags = []
+    if filter_file:
+        with open(filter_file, 'r') as f:
+            filter_flags = [line.strip().upper() == 'TRUE' for line in f]
+
     if mode == "gpt":
         # use chain of thought
         sql_data = json.load(
@@ -78,23 +85,23 @@ def package_sqls(
                 "r",
             )
         )
-        for _, sql_str in sql_data.items():
-            if type(sql_str) == str:
-                sql, db_name = sql_str.split("\t----- bird -----\t")
-            else:
-                sql, db_name = " ", "financial"
-            clean_sqls.append(sql)
-            db_path_list.append(db_root_path + db_name + "/" + db_name + ".sqlite")
+        for idx, (key, sql_str) in enumerate(sql_data.items()):
+            if not filter_flags or filter_flags[idx]:
+                if type(sql_str) == str:
+                    sql, db_name = sql_str.split("\t----- bird -----\t")
+                else:
+                    sql, db_name = " ", "financial"
+                clean_sqls.append(sql)
+                db_path_list.append(db_root_path + db_name + "/" + db_name + ".sqlite")
 
     elif mode == "gt":
         sqls = open(sql_path + data_mode + "_" + sql_dialect + "_gold.sql")
         sql_txt = sqls.readlines()
-        # sql_txt = [sql.split('\t')[0] for sql in sql_txt]
         for idx, sql_str in enumerate(sql_txt):
-            # print(sql_str)
-            sql, db_name = sql_str.strip().split("\t")
-            clean_sqls.append(sql)
-            db_path_list.append(db_root_path + db_name + "/" + db_name + ".sqlite")
+            if not filter_flags or filter_flags[idx]:
+                sql, db_name = sql_str.strip().split("\t")
+                clean_sqls.append(sql)
+                db_path_list.append(db_root_path + db_name + "/" + db_name + ".sqlite")
 
     return clean_sqls, db_path_list
 

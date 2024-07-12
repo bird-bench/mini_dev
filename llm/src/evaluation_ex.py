@@ -66,13 +66,21 @@ def run_sqls_parallel(
     pool.join()
 
 
-def compute_acc_by_diff(exec_results, diff_json_path):
+def compute_acc_by_diff(exec_results, diff_json_path, filter_file=""):
+    # Load filter flags if filter_file is provided
+    filter_flags = []
+    if filter_file:
+        with open(filter_file, 'r') as f:
+            filter_flags = [line.strip().upper() == 'TRUE' for line in f]
+
+
     num_queries = len(exec_results)
     results = [res["res"] for res in exec_results]
     contents = load_json(diff_json_path)
+    filtered_contents = [content for i, content in enumerate(contents) if not filter_flags or filter_flags[i]]
     simple_results, moderate_results, challenging_results = [], [], []
 
-    for i, content in enumerate(contents):
+    for i, content in enumerate(filtered_contents):
         if content["difficulty"] == "simple":
             simple_results.append(exec_results[i])
 
@@ -120,6 +128,7 @@ if __name__ == "__main__":
     args_parser.add_argument("--diff_json_path", type=str, default="")
     args_parser.add_argument("--engine", type=str, default="")
     args_parser.add_argument("--sql_dialect", type=str, default="SQLite")
+    args_parser.add_argument("--filter_file", type=str, default="", help="Path to file containing TRUE/FALSE flags for each query")
     args = args_parser.parse_args()
     exec_result = []
 
@@ -130,6 +139,7 @@ if __name__ == "__main__":
         sql_dialect=args.sql_dialect,
         mode=args.mode_predict,
         data_mode=args.data_mode,
+        filter_file=args.filter_file,
     )
     # generate ground truth sqls:
     gt_queries, db_paths_gt = package_sqls(
@@ -139,6 +149,7 @@ if __name__ == "__main__":
         sql_dialect=args.sql_dialect,
         mode="gt",
         data_mode=args.data_mode,
+        filter_file=args.filter_file,
     )
 
     query_pairs = list(zip(pred_queries, gt_queries))
@@ -153,7 +164,7 @@ if __name__ == "__main__":
     exec_result = sort_results(exec_result)
     print("start calculate")
     simple_acc, moderate_acc, challenging_acc, acc, count_lists = compute_acc_by_diff(
-        exec_result, args.diff_json_path
+        exec_result, args.diff_json_path, args.filter_file
     )
     score_lists = [simple_acc, moderate_acc, challenging_acc, acc]
     print(f"EX for {args.engine} on {args.sql_dialect} set")
