@@ -21,7 +21,7 @@ def calculate_ex(predicted_res, ground_truth_res):
         res = 1
     return res
 
-
+# 여기가 실제로 sql running 하는 곳
 def execute_model(
     predicted_sql, ground_truth, db_place, idx, meta_time_out, sql_dialect
 ):
@@ -125,6 +125,8 @@ if __name__ == "__main__":
     args = args_parser.parse_args()
     exec_result = []
 
+    # pred_quries : postgresql
+    # db_paths : sqlite db path
     pred_queries, db_paths = package_sqls(
         args.predicted_sql_path,
         args.db_root_path,
@@ -134,6 +136,8 @@ if __name__ == "__main__":
         data_mode=args.data_mode,
     )
     # generate ground truth sqls:
+    # gt_quries : postgresql
+    # db_paths : sqlite db path
     gt_queries, db_paths_gt = package_sqls(
         args.ground_truth_path,
         args.db_root_path,
@@ -143,8 +147,11 @@ if __name__ == "__main__":
         data_mode=args.data_mode,
     )
 
+    # quries 묶기 : postgresql
     query_pairs = list(zip(pred_queries, gt_queries))
 
+    # sql 병렬 수행
+    # db_places : sqlite db path
     run_sqls_parallel(
         query_pairs,
         db_places=db_paths,

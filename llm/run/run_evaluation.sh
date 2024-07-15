@@ -1,8 +1,17 @@
-db_root_path='./data/dev_databases/'
-data_mode='mini_dev' # dev, train, mini_dev
-diff_json_path='./data/mini_dev_sqlite.json' # _sqlite.json, _mysql.json, _postgresql.json
+################################################################################################
+################################################################################################
+# diff_json_path => {ground_truth_path/{data_mode}_{sql_dialect.lower()}.json
+# gold_sql_path => {ground_truth_path}/{data_mode}_{sql_dialect.lower()}_gold.sql
+# predicted_json_path (predicted, in evaluation_utils.py) => {predicted_sql_path}/predicted_{data_mode}_{engine}_{sql_dialect.lower()}.json                  \
+################################################################################################
+################################################################################################
+
+db_root_path='dummy/'
+data_mode='mini_dev' # dev, train, mini_dev => 그냥 이름붙일 때 사용, 빼도 됨 
+diff_json_path='./data/mini_dev_postgresql.json' # _sqlite.json, _mysql.json, _postgresql.json
 # Path where the predicted SQL queries are stored
-predicted_sql_path='./exp_result/turbo_output_kg/'
+# predicted_sql_path='./exp_result/turbo_output_kg/'
+predicted_sql_path='./exp_result/sql_output_kg/'
 
 ground_truth_path='./data/'
 num_cpus=16
@@ -17,7 +26,9 @@ engine='gpt-4-turbo'
 # Choose the SQL dialect to run, e.g. SQLite, MySQL, PostgreSQL
 # PLEASE NOTE: You have to setup the database information in evaluation_utils.py 
 # if you want to run the evaluation script using MySQL or PostgreSQL
-sql_dialect='SQLite'
+sql_dialect='PostgreSQL'
+
+# 
 
 echo "starting to compare with knowledge for ex engine: ${engine} sql_dialect: ${sql_dialect}"
 python3 -u ./src/evaluation_ex.py --db_root_path ${db_root_path} --predicted_sql_path ${predicted_sql_path} --data_mode ${data_mode} \

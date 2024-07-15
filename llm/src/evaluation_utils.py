@@ -14,7 +14,7 @@ def connect_postgresql():
     # Open database connection
     # Connect to the database
     db = psycopg2.connect(
-        "dbname=BIRD user=root host=localhost password=YOUR_PASSWORD port=5432"
+        "dbname=BIRD user=postgres host=localhost password=1q2w3e4r5t!@ port=5432"
     )
     return db
 
@@ -57,14 +57,13 @@ def execute_sql(predicted_sql, ground_truth, db_path, sql_dialect, calculate_fun
     res = calculate_func(predicted_res, ground_truth_res)
     return res
 
-
+# FIXED!
 def package_sqls(
     sql_path, db_root_path, engine, sql_dialect="SQLite", mode="gpt", data_mode="dev"
 ):
     clean_sqls = []
     db_path_list = []
     if mode == "gpt":
-        # use chain of thought
         sql_data = json.load(
             open(
                 sql_path
@@ -72,8 +71,8 @@ def package_sqls(
                 + data_mode
                 + "_"
                 + engine
-                + "_cot_"
-                + sql_dialect
+                + "_"
+                + sql_dialect.lower()
                 + ".json",
                 "r",
             )
@@ -87,7 +86,8 @@ def package_sqls(
             db_path_list.append(db_root_path + db_name + "/" + db_name + ".sqlite")
 
     elif mode == "gt":
-        sqls = open(sql_path + data_mode + "_" + sql_dialect + "_gold.sql")
+        # fixed : sql_dialect lower()
+        sqls = open(sql_path + data_mode + "_" + sql_dialect.lower() + "_gold.sql")
         sql_txt = sqls.readlines()
         # sql_txt = [sql.split('\t')[0] for sql in sql_txt]
         for idx, sql_str in enumerate(sql_txt):

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # BIRD-SQL Mini-Dev 
 
 <p align="center">
@@ -315,3 +316,6 @@ Please cite the repo if you think our work is helpful to you.
   year={2024}
 }
 ```
+=======
+# text2sql-evaluation
+>>>>>>> 56bd10c31bcb28257449158e271cdcba0c7b7116
