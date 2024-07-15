@@ -1,4 +1,5 @@
 import sys
+import os
 import json
 import numpy as np
 import argparse
@@ -11,6 +12,7 @@ from evaluation_utils import (
     sort_results,
     print_data,
     connect_db,
+    save_config_and_results
 )
 import time
 import math
@@ -206,6 +208,7 @@ if __name__ == "__main__":
     args_parser.add_argument("--diff_json_path", type=str, default="")
     args_parser.add_argument("--engine", type=str, default="")
     args_parser.add_argument("--sql_dialect", type=str, default="SQLite")
+    args_parser.add_argument("--test_dir", type=str, default="/")
     args = args_parser.parse_args()
     exec_result = []
 
@@ -249,3 +252,21 @@ if __name__ == "__main__":
     )
     print(f"Finished VES evaluation for {args.engine} on {args.sql_dialect} set")
     print("\n\n")
+
+    config = {
+        "db_root_path": args.db_root_path,
+        "data_mode": args.data_mode,
+        "diff_json_path": args.diff_json_path,
+        "predicted_sql_path": os.path.join(args.predicted_sql_path, f"predict_{args.data_mode}_{args.engine}_{args.sql_dialect.lower()}.json"),
+        "ground_truth_json_path": os.path.join(args.ground_truth_path, f"{args.data_mode}_{args.sql_dialect.lower()}.json"),
+        "ground_truth_sql_path": os.path.join(args.ground_truth_path, f"{args.data_mode}_{args.sql_dialect.lower()}_gold.sql"),
+        "num_cpus": args.num_cpus,
+        "meta_time_out": args.meta_time_out,
+        "mode_gt": args.mode_gt,
+        "mode_predict": args.mode_predict,
+        "engine": args.engine,
+        "sql_dialect": args.sql_dialect,
+    }
+
+    test_dir = save_config_and_results(config, exec_result, score_lists, count_lists, args.test_dir, metric="VES")
+    print(f"Results saved in directory: {test_dir}")

@@ -42,3 +42,11 @@ def connect_postgresql():
 cd ./llm/
 sh ./run/run_evaluation.sh
 ```
+
+### 6. Check Test Result
+- Test results are saved in test_results/
+  - config.json
+  - result.csv
+  - detailed_results_EX.csv
+  - detailed_results_VES.csv
+  - detailed_results_F1.csv
