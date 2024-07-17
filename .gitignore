@@ -28,3 +28,7 @@ service_account.json
 
 # Files here are massive - each should copy them in manually
 **/dev_databases/**
+
+# Default agent output files
+agent.log
+report.json
