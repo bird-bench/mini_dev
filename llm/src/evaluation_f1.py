@@ -52,6 +52,10 @@ def calculate_f1_score(predicted, ground_truth):
     Returns:
     float: The calculated F1 score.
     """
+    # if both predicted and ground_truth are empty, return 1.0 for f1_score
+    if not predicted and not ground_truth:
+        return 1.0
+
     # Drop duplicates
     predicted_set = set(predicted) if predicted else set()
     ground_truth_set = set(ground_truth)
