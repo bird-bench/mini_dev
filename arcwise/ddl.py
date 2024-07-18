@@ -19,7 +19,7 @@ def get_table_ddl(table: Table) -> str:
     schema += f"CREATE TABLE {quote_identifier(table.name)} (\n"
     for idx, column in enumerate(table.columns):
         if idx:
-            schema += ","
+            schema += ",\n"
         # Description will be added as a comment above the column line
         if column.ai_description:
             schema += "-- " + column.ai_description.replace("\n", "\n-- ") + "\n"

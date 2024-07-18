@@ -38,22 +38,26 @@ async def agent_loop(
         predicted_columns = ""
         for col in predictions.input_columns:
             predicted_columns += f"- {col.column}"
+            if col.votes:
+                # TODO: maybe 5 = high, 3 = medium, 1 = low? Or we exclude low votes?
+                pass
             # if col.description:
             #     predicted_columns += f" ({col.description})"
             predicted_columns += "\n"
-
-        predicted_outputs = ""
-        for i, col in enumerate(predictions.output_types):
-            predicted_outputs += f"\n{i+1}. {col.type.upper()}: {col.description}"
 
         user_message += f"""
 Hint: The following columns are most relevant to the question:
 {predicted_columns}
 
-When you have the final answer, run `execute_sql` with a `query_identifier` of "final_answer" with all information in one single query.
+When you have the final answer, run `execute_sql` with a `query_identifier` of "final_answer" with all information in one single query."""
+
+        predicted_outputs = ""
+        for i, col in enumerate(predictions.output_types):
+            predicted_outputs += f"\n{i+1}. {col.type.upper()}: {col.description}"
+        if predicted_outputs:
+            user_message += f"""
 I need final_answer to have exactly the following column types:
-{predicted_outputs}
-"""
+{predicted_outputs}"""
 
     message_log: list[ChatCompletionMessageParam] = [
         {

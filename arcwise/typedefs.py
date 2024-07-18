@@ -80,6 +80,7 @@ class LlamaPredictions(BaseModel):
     class InputColumn(BaseModel):
         column: str
         description: str | None = None
+        votes: int | None = None
 
     output_types: list[OutputType]
     input_columns: list[InputColumn]

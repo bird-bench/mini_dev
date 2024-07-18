@@ -1,7 +1,9 @@
 import asyncio
+from collections import defaultdict
 from contextlib import aclosing
 from functools import partial
 import json
+import random
 import click
 import litellm
 import os
@@ -11,6 +13,8 @@ from tqdm import tqdm
 from .ddl import get_database_ddl
 from .typedefs import BIRDQuestion, Database, LlamaPredictions
 from .utils import coro, load_database_metadata, load_questions, run_with_concurrency
+
+N_SAMPLES = 5
 
 
 @click.command()
@@ -84,34 +88,51 @@ async def process_question(
 {'Context: ' + question.evidence if question.evidence else ''}""".strip(),
                 },
             ],
-            temperature=0.0,
-            max_tokens=2000,
+            n=N_SAMPLES,
+            temperature=1.0,
             custom_llm_provider="openai",
         )
-        lines = response.choices[0].message.content.strip().splitlines()  # type: ignore
-        input_columns_line = lines.index("Input Columns")
-        last_desc = None
-        output_types = []
-        for line in lines[1:input_columns_line]:
-            if line.startswith("--"):
-                last_desc = line[2:].strip()
-            elif line:
-                assert last_desc is not None, f"Missing description for output type {line}: {lines}"
-                output_types.append(LlamaPredictions.OutputType(type=line, description=last_desc))
+        input_column_descriptions = defaultdict(list)
+        output_types_by_shape = defaultdict(list)
+        for choice in response.choices:  # type: ignore
+            lines = choice.message.content.strip().splitlines()  # type: ignore
+            if "Input Columns" not in lines:
+                continue
 
-        input_columns = []
-        for line in lines[input_columns_line + 1 :]:
-            if line.startswith("--"):
-                last_desc = line[2:].strip()
-            elif "::" in line:
-                col, table = line.split("::")
-                input_columns.append(
-                    LlamaPredictions.InputColumn(column=table + "." + col, description=last_desc)
-                )
+            input_columns_line = lines.index("Input Columns")
+            if output_types := _parse_output_types(lines[1:input_columns_line]):
+                output_types_by_shape[tuple(o.type for o in output_types)].append(output_types)
+
+            last_desc = None
+            for line in lines[input_columns_line + 1 :]:
+                if line.startswith("--"):
+                    last_desc = line[2:].strip()
+                elif "::" in line:
+                    col, table = line.split("::")
+                    input_column_descriptions[table + "." + col].append(last_desc)
+
+        majority_output = None
+        for outputs in output_types_by_shape.values():
+            if len(outputs) > N_SAMPLES / 2:
+                majority_output = random.choice(outputs)
+
+        # Sort by most common input columns
+        final_input_columns = [
+            LlamaPredictions.InputColumn(
+                column=col,
+                description=random.choice(descs),
+                votes=len(descs),
+            )
+            for col, descs in sorted(
+                input_column_descriptions.items(),
+                key=lambda x: -len(x[1]),
+            )
+        ]
 
         question.llama_predictions = LlamaPredictions(
-            output_types=output_types,
-            input_columns=input_columns,
+            # NOTE: Output prediction is ignored if we couldn't obtain majority
+            output_types=majority_output or [],
+            input_columns=final_input_columns,
         )
     except Exception as err:
         print(
@@ -119,6 +140,20 @@ async def process_question(
             question.model_dump_json(include={"db_id", "question"}),
         )
         print(f"Exception message: {err}")
+
+
+def _parse_output_types(lines: list[str]) -> list[LlamaPredictions.OutputType]:
+    output_types = []
+    last_desc = None
+    for line in lines:
+        if line.startswith("--"):
+            last_desc = line[2:].strip()
+        elif type_ := line.strip():
+            if not last_desc or type_ not in {"real", "integer", "text", "date", "datetime"}:
+                return []
+            output_types.append(LlamaPredictions.OutputType(type=type_, description=last_desc))
+            last_desc = None
+    return output_types
 
 
 SCHEMA_PREDICTION_PROMPT = [

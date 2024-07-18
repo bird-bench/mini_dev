@@ -16,7 +16,12 @@ class SQLReferences(BaseModel):
     output_schema: list[str]
 
 
-def extract_sql_references(db_path: str, tables: list[Table], query: str) -> SQLReferences:
+def extract_sql_references(
+    db_path: str,
+    tables: list[Table],
+    query: str,
+    query_runtime_types: bool = True,
+) -> SQLReferences:
     # Parse the query using sqlglot
     parsed = sqlglot.parse_one(query, dialect="sqlite")
     parsed = normalize_identifiers(parsed, dialect="sqlite")
@@ -63,7 +68,7 @@ def extract_sql_references(db_path: str, tables: list[Table], query: str) -> SQL
     ]
     assert output_schema, f"No output schema for {parsed}"
 
-    if "unknown" in output_schema or "null" in output_schema:
+    if query_runtime_types and ("unknown" in output_schema or "null" in output_schema):
         # Wrap each selected column in a typeof() and execute it
         sql = (
             sqlglot.select(
