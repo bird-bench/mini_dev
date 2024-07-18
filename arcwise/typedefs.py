@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
+from enum import Enum
+
 
 from pydantic import BaseModel
 
@@ -9,6 +11,18 @@ class ForeignKey(BaseModel):
     reference_column: str
     relationship: str
 
+class ColumnType(str, Enum):
+    Array = "array"
+    Boolean = "boolean"
+    Bytes = "bytes"
+    Date = "date"
+    # Integer not useful when decoding snowflake queries. All column returns are `FIXED`
+    # See https://docs.snowflake.com/en/sql-reference/data-types-numeric
+    # Integer = "integer"
+    Number = "number"
+    String = "string"
+    Time = "time"
+    Unknown = "unknown"
 
 class ColumnInfo(BaseModel):
     name: str

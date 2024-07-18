@@ -10,6 +10,15 @@ Arcwise team submission for https://bird-bench.github.io
 poetry install
 poetry shell
 
+# minidev generate db metadata
+ANTHROPIC_API_KEY=sk-xxx \
+python -m arcwise.generate_db_metadata.main \
+  --db-path bird_evaluation/data/dev_databases \
+  --tables-json bird_evaluation/data/dev_tables.json \
+  --output-schemas-path bird_evaluation/data/schemas \
+  --output-metadata-file bird_evaluation/data/dev_metadata.json
+
+
 OPENAI_API_KEY=sk-xxxxx
 
 # minidev evaluation (unaided)

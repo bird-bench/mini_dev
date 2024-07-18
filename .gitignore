@@ -32,3 +32,5 @@ service_account.json
 # Default agent output files
 agent.log
 report.json
+
+.vscode/
