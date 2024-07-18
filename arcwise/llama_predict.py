@@ -1,8 +1,11 @@
+import asyncio
 from contextlib import aclosing
 from functools import partial
 import json
 import click
 import litellm
+import os
+import requests
 from tqdm import tqdm
 
 from .ddl import get_database_ddl
@@ -24,6 +27,16 @@ async def main(
     model: str,
     concurrency: int,
 ) -> None:
+    if custom_base_url := os.environ.get("OPENAI_API_BASE"):
+        # Allow for warmup time
+        while True:
+            # Note: will still throw an exception if the domain is non-existent
+            response = requests.get(custom_base_url, timeout=600)
+            if response.ok or response.status_code == 404:
+                break
+            print(f"Got {response.status_code} from {custom_base_url}, retrying...")
+            await asyncio.sleep(1)
+
     questions = load_questions(questions_file)
     metadata = load_database_metadata(metadata_file)
 
