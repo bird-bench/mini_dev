@@ -19,6 +19,7 @@ cachetools = "^5.4.0"
 sqlalchemy = "^2.0.31"
 fastapi = "^0.111.0"
 numpy = "^1.21.2"
+aioboto3 = "^12.3.0"
 
 [tool.poetry.group.retrieval.dependencies]
 llama-index-core = "^0.10.55"
