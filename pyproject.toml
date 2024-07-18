@@ -20,6 +20,15 @@ sqlalchemy = "^2.0.31"
 fastapi = "^0.111.0"
 numpy = "^1.21.2"
 
+[tool.poetry.group.retrieval.dependencies]
+llama-index-core = "^0.10.55"
+llama-index-embeddings-bedrock = "^0.2.1"
+llama-index-embeddings-gemini = "^0.1.8"
+llama-index-embeddings-openai = "^0.1.10"
+llama-index-embeddings-voyageai = "^0.1.4"
+llama-index-vector-stores-duckdb = "^0.1.5"
+transformers = "^4.42.4"
+
 
 [tool.ruff]
 line-length = 100
