@@ -1,21 +1,13 @@
 from contextlib import aclosing
+from functools import partial
 import json
 import click
 import litellm
 from tqdm import tqdm
 
 from .ddl import get_database_ddl
-from .typedefs import (
-    BIRDQuestion,
-    Database,
-    LlamaPredictions,
-)
-from .utils import (
-    coro,
-    load_database_metadata,
-    load_questions,
-    run_with_concurrency,
-)
+from .typedefs import BIRDQuestion, Database, LlamaPredictions
+from .utils import coro, load_database_metadata, load_questions, run_with_concurrency
 
 
 @click.command()
@@ -23,8 +15,6 @@ from .utils import (
 @click.option("--output-file", help="Path to output file", required=True)
 @click.option("--metadata-file", help="Path to JSON metadata", required=True)
 @click.option("--model", help="Model identifier", required=True)
-@click.option("--api-endpoint", help="OpenAI-compatible URL", required=True)
-@click.option("--api-key", help="OpenAI-compatible API key", required=True)
 @click.option("--concurrency", default=2, help="Number of questions to evaluate concurrently")
 @coro
 async def main(
@@ -32,28 +22,20 @@ async def main(
     output_file: str,
     metadata_file: str,
     model: str,
-    api_endpoint: str,
-    api_key: str,
     concurrency: int,
 ) -> None:
     questions = load_questions(questions_file)
     metadata = load_database_metadata(metadata_file)
 
     callables = [
-        lambda: process_question(
-            question,
-            metadata[question.db_id],
-            model=model,
-            api_endpoint=api_endpoint,
-            api_key=api_key,
-        )
+        partial(process_question, question, metadata[question.db_id], model)
         for question in questions
         if not question.llama_predictions
     ]
 
     def _write_output() -> None:
         with open(output_file, "w") as f:
-            json.dump([q.model_dump(exclude_unset=True) for q in questions], f, indent=2)
+            json.dump([q.model_dump(exclude_none=True) for q in questions], f, indent=2)
 
     async with aclosing(run_with_concurrency(callables, concurrency)) as results:
         with tqdm(total=len(callables)) as pbar:
@@ -68,10 +50,7 @@ async def main(
 async def process_question(
     question: BIRDQuestion,
     db: Database,
-    *,
     model: str,
-    api_endpoint: str,
-    api_key: str,
 ) -> None:
     # TODO implement basic retrieval pass
     schema = get_database_ddl(db)
@@ -94,8 +73,7 @@ async def process_question(
             ],
             temperature=0.0,
             max_tokens=2000,
-            base_url=api_endpoint,
-            api_key=api_key,
+            custom_llm_provider="openai",
         )
         lines = response.choices[0].message.content.strip().splitlines()  # type: ignore
         input_columns_line = lines.index("Input Columns")
