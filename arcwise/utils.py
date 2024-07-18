@@ -1,81 +1,60 @@
-import subprocess
-from typing import List
-
-import sqlglot
-import sqlglot.expressions as exp
-from pydantic import BaseModel
-from sqlglot.optimizer.normalize_identifiers import normalize_identifiers
-from sqlglot.optimizer.optimizer import optimize
-from sqlglot.optimizer.scope import traverse_scope
-
-from .typedefs import Table
+import asyncio
+import json
+from typing import AsyncGenerator, Awaitable, Callable, Sequence, TypeVar
 
 
-class SQLReferences(BaseModel):
-    tables: List[str]
-    columns: List[str]
-    output_schema: List[str]
+from .typedefs import Database, BIRDQuestion
 
 
-def extract_sql_references(db_path: str, tables: list[Table], query: str) -> SQLReferences:
-    # Parse the query using sqlglot
-    parsed = sqlglot.parse_one(query, dialect="sqlite")
-    parsed = normalize_identifiers(parsed, dialect="sqlite")
-    parsed = optimize(
-        parsed,
-        schema={table.name: {col.name: col.type for col in table.columns} for table in tables},
-        dialect="sqlite",
-    )
+# Make an async function runnable synchronously (i.e. main())
+def coro(f):  # type: ignore
+    def wrapper(*args, **kwargs):  # type: ignore
+        return asyncio.run(f(*args, **kwargs))
 
-    table_names_lower = {table.name.lower(): table for table in tables}
-    ref_tables = []
-    for table in parsed.find_all(exp.Table):
-        if (
-            orig_table := table_names_lower.get(table.name.lower())
-        ) and table.name not in ref_tables:
-            ref_tables.append(orig_table.name)
+    return wrapper
 
-    # Extract columns
-    ref_columns = []
-    for scope in traverse_scope(parsed):
-        for col in scope.columns:
-            if not col.table:
-                continue
 
-            source = scope.sources.get(col.table)
-            if isinstance(source, exp.Table):
-                orig_table = table_names_lower[source.name.lower()]
-                orig_col_name = next(
-                    orig_col.name
-                    for orig_col in orig_table.columns
-                    if orig_col.name.lower() == col.name.lower()
-                )
-                q = f"{orig_table.name}.{orig_col_name}"
-                if q not in ref_columns:
-                    ref_columns.append(q)
+T = TypeVar("T")
 
-    while isinstance(parsed, (exp.Except, exp.Intersect, exp.Union)):
-        parsed = parsed.left
 
-    assert isinstance(parsed, exp.Select), f"Expected SELECT, got {type(parsed)}"
-    output_schema = [
-        exp.DataType.build(expr.type.this).sql(dialect="sqlite").lower()
-        for expr in parsed.expressions
+async def run_with_concurrency(
+    callables: Sequence[Callable[[], Awaitable[T]]],
+    concurrency: int,
+) -> AsyncGenerator[tuple[int, T], None]:
+    semaphore = asyncio.Semaphore(concurrency)
+
+    async def _concurrency_wrapper(index: int, aw: Callable[[], Awaitable[T]]) -> tuple[int, T]:
+        async with semaphore:
+            return index, await aw()
+
+    tasks = [
+        asyncio.create_task(_concurrency_wrapper(index, c)) for index, c in enumerate(callables)
     ]
-    assert output_schema, f"No output schema for {parsed}"
+    for result in asyncio.as_completed(tasks):
+        yield await result
 
-    if "unknown" in output_schema or "null" in output_schema:
-        # Wrap each selected column in a typeof() and execute it
-        sql = (
-            sqlglot.select(
-                *[sqlglot.func("typeof", sqlglot.column(col.alias)) for col in parsed.expressions]
-            )
-            .from_(parsed.subquery())
-            .limit(1)
-            .sql(dialect="sqlite")
-        )
-        # More reliable than using built-in SQLite3 (and we can apply a timeout for bad queries)
-        output = subprocess.check_output(["sqlite3", "-csv", db_path, sql], timeout=20.0)
-        output_schema = output.decode().strip().split(",")
 
-    return SQLReferences(tables=ref_tables, columns=ref_columns, output_schema=output_schema)
+def load_questions(
+    questions_file: str, question_ids: list[int] | None = None
+) -> list[BIRDQuestion]:
+    with open(questions_file) as f:
+        questions_raw = json.load(f)
+        assert isinstance(questions_raw, list), f"{questions_file} must contain a JSON list"
+
+    return [
+        BIRDQuestion.model_validate(q)
+        for q in questions_raw
+        if question_ids is None
+        or (question_id := q.get("question_id")) is None
+        or question_id in question_ids
+    ]
+
+
+def load_database_metadata(
+    metadata_file: str,
+) -> dict[str, Database]:
+    with open(metadata_file) as f:
+        metadata_raw = json.load(f)
+        assert isinstance(metadata_raw, list), f"{metadata_file} must contain a JSON list"
+
+    return {db["name"]: Database.model_validate(db) for db in metadata_raw}

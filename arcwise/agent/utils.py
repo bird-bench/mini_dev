@@ -1,35 +1,10 @@
-import asyncio
 import csv
 from dataclasses import dataclass
 from io import StringIO
 from typing import Any
 
 from litellm.types.completion import ChatCompletionMessageParam
-from pydantic import BaseModel
 from ..typedefs import Database
-
-
-class LlamaPredictions(BaseModel):
-    class OutputType(BaseModel):
-        type: str
-        description: str
-
-    class InputColumn(BaseModel):
-        column: str
-        description: str | None = None
-
-    output_types: list[OutputType]
-    input_columns: list[InputColumn]
-
-
-class BIRDQuestion(BaseModel):
-    db_id: str
-    question: str
-    evidence: str | None = None
-    SQL: str | None = None
-    question_id: int | None = None
-    llama_predictions: LlamaPredictions | None = None
-    filtered_schema: str | None = None
 
 
 @dataclass
@@ -58,7 +33,6 @@ class EvaluationResult:
 class SQLContext:
     dialect: str
     db_url: str
-    db_schema: str
     db_metadata: dict[str, Database]
     model: str
 
@@ -68,10 +42,3 @@ def to_tsv(data: list[list[Any]]) -> str:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
         writer.writerows(data)
         return f.getvalue().strip("\n")
-
-
-def coro(f):  # type: ignore
-    def wrapper(*args, **kwargs):  # type: ignore
-        return asyncio.run(f(*args, **kwargs))
-
-    return wrapper

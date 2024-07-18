@@ -12,11 +12,11 @@ class ForeignKey(BaseModel):
 
 class ColumnInfo(BaseModel):
     name: str
-    original_name: str | None
+    original_name: str | None = None
     type: str
     ai_description: str | None = None
-    description: str | None
-    value_description: str | None
+    description: str | None = None
+    value_description: str | None = None
     foreign_keys: list[ForeignKey]
     null_fraction: float
     unique_count: int
@@ -56,3 +56,26 @@ class BIRDDatabase(BaseModel):
     column_names_original: list[tuple[int, str]]  # (table_index, column_name)
     primary_keys: list[list[int] | int]  # index into column_names_original
     foreign_keys: list[tuple[int, int]]  # index into column_names_original
+
+
+class LlamaPredictions(BaseModel):
+    class OutputType(BaseModel):
+        type: str
+        description: str
+
+    class InputColumn(BaseModel):
+        column: str
+        description: str | None = None
+
+    output_types: list[OutputType]
+    input_columns: list[InputColumn]
+
+
+class BIRDQuestion(BaseModel):
+    db_id: str
+    question: str
+    evidence: str | None = None
+    SQL: str | None = None
+    question_id: int | None = None
+    llama_predictions: LlamaPredictions | None = None
+    filtered_schema: str | None = None

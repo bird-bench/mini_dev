@@ -8,12 +8,14 @@ from litellm import asyncio
 from tqdm import tqdm
 
 from .run_agent import evaluate_question
-from .utils import Database, BIRDQuestion, EvaluationResult, SQLContext, coro
+from .utils import EvaluationResult, SQLContext
+from ..typedefs import BIRDQuestion
+from ..utils import coro, load_database_metadata, load_questions
 
 
 @click.command()
 @click.option("--db-path", help="Path to SQLite databases", required=True)
-@click.option("--schema-path", help="Path to directory with schemas", required=True)
+@click.option("--metadata-file", help="Path to metadata.json file", required=True)
 @click.option(
     "--questions-file",
     help="Path to questions JSON",
@@ -28,7 +30,7 @@ from .utils import Database, BIRDQuestion, EvaluationResult, SQLContext, coro
 @coro
 async def main(
     db_path: str,
-    schema_path: str,
+    metadata_file: str,
     questions_file: str,
     question_ids: str,
     model: str,
@@ -48,32 +50,9 @@ async def main(
         level=logging.INFO,
     )
 
-    with open(questions_file) as f:
-        questions_raw = json.load(f)
-        assert isinstance(questions_raw, list), f"{questions_file} must contain a JSON list"
-
-    schemas = {}
-    questions: list[BIRDQuestion] = []
-    question_id_list = question_ids.split(",") if question_ids else []
-    db_metadata = {}
-    for i, q in enumerate(questions_raw):
-        try:
-            question = BIRDQuestion.model_validate(q)
-            if question_id_list and (
-                question.question_id is None or str(question.question_id) not in question_id_list
-            ):
-                continue
-        except Exception as e:
-            print(f"Error parsing question on line {i + 1}: {e}")
-            continue
-
-        questions.append(question)
-        with open(f"{schema_path}/{question.db_id}.sql") as f:
-            schemas[question.db_id] = f.read().strip()
-        with open(f"{schema_path}/metadata.json") as f:
-            for entry in json.load(f):
-                db = Database.model_validate(entry)
-                db_metadata[db.name] = db
+    question_id_list = list(map(int, question_ids.split(","))) if question_ids else None
+    questions = load_questions(questions_file, question_id_list)
+    db_metadata = load_database_metadata(metadata_file)
 
     semaphore = asyncio.Semaphore(concurrency)
 
@@ -107,7 +86,6 @@ async def main(
                     SQLContext(
                         dialect="sqlite",
                         db_url=db_path + f"/{q.db_id}/{q.db_id}.sqlite",
-                        db_schema=schemas[q.db_id],
                         db_metadata=db_metadata,
                         model=model,
                     ),

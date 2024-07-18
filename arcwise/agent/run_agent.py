@@ -1,10 +1,12 @@
 import logging
 import traceback
 
+import litellm
 from dotenv import load_dotenv
 from openai.types.chat import ChatCompletion
-import litellm
 
+from ..ddl import get_database_ddl
+from ..typedefs import BIRDQuestion
 from .execute_sql import (
     EXECUTE_SQL_TOOL,
     ExecuteSQLToolArguments,
@@ -13,12 +15,7 @@ from .execute_sql import (
     execute_sql_tool,
 )
 from .prompts import SYSTEM_PROMPT
-from .utils import (
-    BIRDQuestion,
-    ChatCompletionMessageParam,
-    EvaluationResult,
-    SQLContext,
-)
+from .utils import ChatCompletionMessageParam, EvaluationResult, SQLContext
 
 load_dotenv()
 
@@ -45,35 +42,28 @@ async def agent_loop(
             #     predicted_columns += f" ({col.description})"
             predicted_columns += "\n"
 
-        # Logit-based
-        # sorted_input_column_logits = sorted(predictions.input_column_logits.items(), key=lambda x: x[1], reverse=True)
-        # for key, value in sorted_input_column_logits:
-        #     if value < -1:
-        #         break
-        #     predicted_columns += f"- {key}: "
-        #     if value >= 1:
-        #         predicted_columns += "high relevance"
-        #     else:
-        #         predicted_columns += "medium relevance"
-        #     predicted_columns += "\n"
+        predicted_outputs = ""
+        for i, col in enumerate(predictions.output_types):
+            predicted_outputs += f"\n{i+1}. {col.type.upper()}: {col.description}"
 
         user_message += f"""
 Hint: The following columns are most relevant to the question:
 {predicted_columns}
-"""
-        user_message += """
+
 When you have the final answer, run `execute_sql` with a `query_identifier` of "final_answer" with all information in one single query.
 I need final_answer to have exactly the following column types:
+{predicted_outputs}
 """
-        for i, col in enumerate(predictions.output_types):
-            user_message += f"\n{i+1}. {col.type.upper()}: {col.description}"
-
-        # TODO: try injecting predictions.input_columns and/or predictions.input_column_logits
 
     message_log: list[ChatCompletionMessageParam] = [
         {
             "role": "system",
-            "content": SYSTEM_PROMPT + "\n\n" + (question.filtered_schema or sql_context.db_schema),
+            "content": SYSTEM_PROMPT
+            + "\n\n"
+            + (
+                question.filtered_schema
+                or get_database_ddl(sql_context.db_metadata[question.db_id])
+            ),
         },
         {"role": "user", "content": user_message},
     ]
