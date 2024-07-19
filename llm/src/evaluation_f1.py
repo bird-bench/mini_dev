@@ -69,6 +69,7 @@ def calculate_f1_score(predicted, ground_truth):
     pred_only_scores = []
     truth_only_scores = []
     for i, gt_row in enumerate(ground_truth):
+        # rows only in the ground truth results
         if i >= len(predicted):
             match_scores.append(0)
             truth_only_scores.append(1)
@@ -81,7 +82,8 @@ def calculate_f1_score(predicted, ground_truth):
         pred_only_scores.append(pred_only_score)
         truth_only_scores.append(truth_only_score)
 
-    for i in range(len(ground_truth) - len(predicted)):
+    # rows only in the predicted results
+    for i in range(len(predicted) - len(ground_truth)):
         match_scores.append(0)
         pred_only_scores.append(1)
         truth_only_scores.append(0)
