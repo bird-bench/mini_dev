@@ -1,0 +1,55 @@
+model_list:
+  - model_name: gpt-4o 
+    litellm_params: 
+      model: azure/gpt-4o
+      api_key: "os.environ/AZURE_OPENAI_KEY"
+      api_version: 2024-05-01-preview
+      api_base: https://arcwise-ai.openai.azure.com
+      tpm: 450000
+      rpm: 2700
+  - model_name: gpt-4o 
+    litellm_params: 
+      model: azure/gpt-4o
+      api_key: "os.environ/AZURE_OPENAI_KEY_USEAST2"
+      api_version: 2024-05-01-preview
+      api_base: https://arcwise-ai-useast2.openai.azure.com
+      tpm: 450000
+      rpm: 2700
+  - model_name: gpt-4o 
+    litellm_params: 
+      model: azure/gpt-4o
+      api_key: "os.environ/AZURE_OPENAI_KEY_USWEST"
+      api_version: 2024-05-01-preview
+      api_base: https://arcwise-ai-uswest.openai.azure.com
+      tpm: 450000
+      rpm: 900
+  - model_name: claude-3.5-sonnet
+    litellm_params: 
+      model: bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0
+      aws_access_key_id: "os.environ/AWS_ACCESS_KEY"
+      aws_secret_access_key: "os.environ/AWS_SECRET_ACCESS_KEY"
+      aws_region_name: us-east-1
+      tpm: 400000
+      rpm: 50
+  - model_name: claude-3.5-sonnet
+    litellm_params: 
+      model: claude-3-5-sonnet-20240620
+      aws_access_key_id: "os.environ/ANTHROPIC_API_KEY"
+  - model_name: voyage-code-2
+    litellm_params: 
+      model: voyage/voyage-code-2
+      api_key: "os.environ/VOYAGE_API_KEY"
+  - model_name: llama3-output-input
+    litellm_params: 
+      model: llama3-output-input
+      base_url: https://arcwisedata--bird-llama-inference-web.modal.run/v1
+      api_key: getdatawise
+      custom_llm_provider: openai
+
+
+
+litellm_settings: 
+  drop_params: True
+
+general_settings: 
+  master_key: getdatawise
