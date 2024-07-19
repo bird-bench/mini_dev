@@ -675,7 +675,7 @@
             "type": "text",
             "ai_description": null,
             "description": "frequency of the acount",
-            "value_description": "\"POPLATEK MESICNE\" stands for monthly issuance \"POPLATEK TYDNE\" stands for weekly issuance \"POPLATEK PO OBRATU\" stands for issuance after transaction",
+            "value_description": null,
             "foreign_keys": [],
             "null_fraction": 0.0,
             "unique_count": 3,

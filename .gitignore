@@ -28,6 +28,7 @@ service_account.json
 
 # Files here are massive - each should copy them in manually
 **/dev_databases/**
+**/train_databases/**
 retrieval_storage
 
 # Default agent output files

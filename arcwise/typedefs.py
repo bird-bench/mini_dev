@@ -67,6 +67,7 @@ class ColumnStatistics:
 class BIRDDatabase(BaseModel):
     db_id: str
     table_names_original: list[str]
+    table_names: list[str]
     column_names_original: list[tuple[int, str]]  # (table_index, column_name)
     primary_keys: list[list[int] | int]  # index into column_names_original
     foreign_keys: list[tuple[int, int]]  # index into column_names_original
