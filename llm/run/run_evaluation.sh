@@ -9,7 +9,7 @@
 
 db_root_path='dummy/'
 data_mode='mini_dev' # dev, train, mini_dev => 그냥 이름붙일 때 사용, 빼도 됨 
-diff_json_path='./data/mini_dev_postgresql.json' # _sqlite.json, _mysql.json, _postgresql.json
+diff_json_path='./data/mini_dev_mysql.json' # _sqlite.json, _mysql.json, _postgresql.json
 # Path where the predicted SQL queries are stored
 predicted_sql_path='./exp_result/sql_output_kg/'
 
@@ -22,11 +22,10 @@ mode_predict='gpt'
 # Choose the engine to run, e.g. gpt-4, gpt-4-32k, gpt-4-turbo, gpt-35-turbo, GPT35-turbo-instruct
 engine='gpt-4-turbo'
 
-
 # Choose the SQL dialect to run, e.g. SQLite, MySQL, PostgreSQL
 # PLEASE NOTE: You have to setup the database information in evaluation_utils.py 
 # if you want to run the evaluation script using MySQL or PostgreSQL
-sql_dialect='PostgreSQL'
+sql_dialect='MySQL'
 
 timestamp=$(date +"%Y%m%d_%H%M%S")
 test_dir="test_results/${engine}_${sql_dialect}_${timestamp}"
