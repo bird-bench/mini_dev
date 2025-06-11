@@ -1,240 +1,176 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import os
-from openai import AzureOpenAI
-from tqdm import tqdm
-import time
-from concurrent.futures import ThreadPoolExecutor
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
+from pathlib import Path
 
+from tqdm import tqdm
+
+from llm_client import LLMClient
 from prompt import generate_combined_prompts_one
 
 
-"""openai configure"""
-api_version = "2024-02-01"
-api_base = "https://gcrendpoint.azurewebsites.net"
-
-
-def new_directory(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-
-def connect_gpt(engine, prompt, max_tokens, temperature, stop, client):
+@dataclass
+class Config:
     """
-    Function to connect to the GPT API and get the response.
+    Encapsulates all script configurations.
     """
-    MAX_API_RETRY = 10
-    for i in range(MAX_API_RETRY):
-        time.sleep(2)
-        try:
+    # API and Model Config
+    provider: str # 'azure' | 'openai'
+    base_url: str
+    api_key: str
+    api_version: str
+    model: str
 
-            if engine == "gpt-35-turbo-instruct":
-                result = client.completions.create(
-                    model="gpt-3.5-turbo-instruct",
-                    prompt=prompt,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                    stop=stop,
-                )
-                result = result.choices[0].text
-            else:  # gpt-4-turbo, gpt-4, gpt-4-32k, gpt-35-turbo
-                messages = [
-                    {"role": "user", "content": prompt},
-                ]
-                result = client.chat.completions.create(
-                    model=engine,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    stop=stop,
-                )
-            break
-        except Exception as e:
-            result = "error:{}".format(e)
-            print(result)
-            time.sleep(4)
-    return result
+    # Data and Path Config
+    eval_path: str
+    db_root_path: str
+    data_output_path: str
 
+    # Execution Config
+    mode: str = "dev"
+    use_knowledge: bool = False
+    chain_of_thought: bool = False
+    num_threads: int = 3
+    sql_dialect: str = "SQLite"
 
-def decouple_question_schema(datasets, db_root_path):
-    question_list = []
-    db_path_list = []
-    knowledge_list = []
-    for i, data in enumerate(datasets):
-        question_list.append(data["question"])
-        cur_db_path = db_root_path + data["db_id"] + "/" + data["db_id"] + ".sqlite"
-        db_path_list.append(cur_db_path)
-        knowledge_list.append(data["evidence"])
-
-    return question_list, db_path_list, knowledge_list
-
-
-def generate_sql_file(sql_lst, output_path=None):
+@dataclass
+class Task:
     """
-    Function to save the SQL results to a file.
+    Represents a single task for the worker to process.
     """
-    sql_lst.sort(key=lambda x: x[1])
-    result = {}
-    for i, (sql, _) in enumerate(sql_lst):
-        result[i] = sql
-
-    if output_path:
-        directory_path = os.path.dirname(output_path)
-        new_directory(directory_path)
-        json.dump(result, open(output_path, "w"), indent=4)
-
-    return result
+    index: int
+    question: str
+    db_path: str
+    prompt: str
 
 
-def init_client(api_key, api_version, engine):
+def prepare_tasks(config: Config):
     """
-    Initialize the AzureOpenAI client for a worker.
+    Prepares the list of tasks to be processed.
     """
-    return AzureOpenAI(
-        api_key=api_key,
-        api_version=api_version,
-        base_url=f"{api_base}/openai/deployments/{engine}",
+    with open(config.eval_path, 'r') as f:
+        eval_data = json.load(f)
+
+    tasks = []
+    for i, data in enumerate(eval_data):
+        db_path = Path(config.db_root_path )/ data["db_id"] / f"{data['db_id']}.sqlite"
+        knowledge = data.get("evidence") if config.use_knowledge else None
+
+        prompt = generate_combined_prompts_one(
+            db_path=db_path,
+            question=data["question"],
+            sql_dialect=config.sql_dialect,
+            knowledge=knowledge,
+        )
+        tasks.append(Task(index=i, question=data["question"], db_path=db_path, prompt=prompt))
+
+    return tasks
+
+def process_task(task: Task, client: LLMClient) -> tuple[str, int]:
+    """
+    Worker function to process a single task.
+    """
+    response_text = client.ask(task.prompt)
+    db_id = Path(task.db_path).stem
+    sql_result = f"{response_text}\t----- bird -----\t{db_id}"
+    print(f"Processed {task.index}th question: {task.question}")
+
+    return sql_result, task.index
+
+def generate_sql_file(results: list, output_path: Path):
+    """
+    Saves the generated SQL results to a JSON file, sorted by index.
+    """
+    if not results:
+        return
+
+    results.sort(key=lambda x: x[1])
+    output_dict = {i: sql for i, (sql, _) in enumerate(results)}
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(output_path, "w") as f:
+        json.dump(output_dict, f, indent=4)
+    print(f"Successfully saved results to {output_path}")
+
+def load_config():
+    args_parser = argparse.ArgumentParser()
+    # API and Model Config
+    args_parser.add_argument("--provider", type=str, default="openai")
+    args_parser.add_argument("--base_url", type=str, required=True)
+    args_parser.add_argument("--api_key", type=str, required=True)
+    args_parser.add_argument("--api_version", type=str, default="")
+    args_parser.add_argument(
+        "--model", type=str, required=True, default="code-davinci-002"
     )
 
+    # Data and Path Config
+    args_parser.add_argument("--eval_path", type=str, default="")
+    args_parser.add_argument("--db_root_path", type=str, default="")
+    args_parser.add_argument("--data_output_path", type=str)
 
-def post_process_response(response, db_path):
-    sql = response if isinstance(response, str) else response.choices[0].message.content
-    db_id = db_path.split("/")[-1].split(".sqlite")[0]
-    sql = f"{sql}\t----- bird -----\t{db_id}"
-    return sql
+    # Execution Config
+    args_parser.add_argument("--mode", type=str, default="dev")
+    args_parser.add_argument("--sql_dialect", type=str, default="SQLite")
+    args_parser.add_argument("--num_threads", type=int, default=3)
+    args_parser.add_argument("--use_knowledge", type=str, default="False")
+    args_parser.add_argument("--chain_of_thought", type=str)
 
+    args = args_parser.parse_args()
 
-def worker_function(question_data):
-    """
-    Function to process each question, set up the client,
-    generate the prompt, and collect the GPT response.
-    """
-    prompt, engine, client, db_path, question, i = question_data
-    response = connect_gpt(engine, prompt, 512, 0, ["--", "\n\n", ";", "#"], client)
-    sql = post_process_response(response, db_path)
-    print(f"Processed {i}th question: {question}")
-    return sql, i
+    return Config(
+        provider=args.provider,
+        base_url=args.base_url,
+        api_key=args.api_key,
+        api_version=args.api_version,
+        model=args.model,
+        eval_path=args.eval_path,
+        db_root_path=args.db_root_path,
+        data_output_path=args.data_output_path,
+        mode=args.mode,
+        sql_dialect=args.sql_dialect,
+        num_threads=args.num_threads,
+        use_knowledge=args.use_knowledge,
+        chain_of_thought=args.chain_of_thought,
+    )
 
+def main():
+    cfg = load_config()
+    llm = LLMClient(
+        provider=cfg.provider,
+        model=cfg.model,
+        api_key=cfg.api_key,
+        base_url=cfg.base_url,
+        api_version=cfg.api_version
+    )
+    tasks = prepare_tasks(cfg)
+    all_responses = []
+    
+    with ThreadPoolExecutor(max_workers=cfg.num_threads) as executor:
+        future_to_task = {executor.submit(process_task, task, llm): task for task in tasks}
 
-def collect_response_from_gpt(
-    db_path_list,
-    question_list,
-    api_key,
-    engine,
-    sql_dialect,
-    num_threads=3,
-    knowledge_list=None,
-):
-    """
-    Collect responses from GPT using multiple threads.
-    """
-    client = init_client(api_key, api_version, engine)
+        for future in tqdm(as_completed(future_to_task), total=len(tasks), desc="Generating SQL"):
+            try:
+                result = future.result()
+                all_responses.append(result)
+            except Exception as e:
+                print(f"A task generated an exception: {e}")
 
-    tasks = [
-        (
-            generate_combined_prompts_one(
-                db_path=db_path_list[i],
-                question=question_list[i],
-                sql_dialect=sql_dialect,
-                knowledge=knowledge_list[i],
-            ),
-            engine,
-            client,
-            db_path_list[i],
-            question_list[i],
-            i,
-        )
-        for i in range(len(question_list))
-    ]
-    responses = []
-    with ThreadPoolExecutor(max_workers=num_threads) as executor:
-        future_to_task = {
-            executor.submit(worker_function, task): task for task in tasks
-        }
-        for future in tqdm(
-            concurrent.futures.as_completed(future_to_task), total=len(tasks)
-        ):
-            responses.append(future.result())
-    return responses
+    cot_suffix = "_cot" if cfg.chain_of_thought else ""
+    output_file =(
+        Path(cfg.data_output_path) /
+        f"predict_{cfg.mode}_{cfg.model}{cot_suffix}_{cfg.sql_dialect}.json"
+    )
+
+    generate_sql_file(results=all_responses, output_path=output_file)
+
+    print(
+        f"successfully collect results from {cfg.model} for {cfg.mode} evaluation; "
+        f"SQL dialect {cfg.sql_dialect} Use knowledge: {cfg.use_knowledge}; "
+        f"Use COT: {cfg.chain_of_thought}"
+    )
 
 
 if __name__ == "__main__":
-    args_parser = argparse.ArgumentParser()
-    args_parser.add_argument("--eval_path", type=str, default="")
-    args_parser.add_argument("--mode", type=str, default="dev")
-    args_parser.add_argument("--test_path", type=str, default="")
-    args_parser.add_argument("--use_knowledge", type=str, default="False")
-    args_parser.add_argument("--db_root_path", type=str, default="")
-    args_parser.add_argument("--api_key", type=str, required=True)
-    args_parser.add_argument(
-        "--engine", type=str, required=True, default="code-davinci-002"
-    )
-    args_parser.add_argument("--data_output_path", type=str)
-    args_parser.add_argument("--chain_of_thought", type=str)
-    args_parser.add_argument("--num_processes", type=int, default=3)
-    args_parser.add_argument("--sql_dialect", type=str, default="SQLite")
-    args = args_parser.parse_args()
-
-    eval_data = json.load(open(args.eval_path, "r"))
-
-    question_list, db_path_list, knowledge_list = decouple_question_schema(
-        datasets=eval_data, db_root_path=args.db_root_path
-    )
-    assert len(question_list) == len(db_path_list) == len(knowledge_list)
-
-    if args.use_knowledge == "True":
-        responses = collect_response_from_gpt(
-            db_path_list,
-            question_list,
-            args.api_key,
-            args.engine,
-            args.sql_dialect,
-            args.num_processes,
-            knowledge_list,
-        )
-    else:
-        responses = collect_response_from_gpt(
-            db_path_list,
-            question_list,
-            args.api_key,
-            args.engine,
-            args.sql_dialect,
-            args.num_processes,
-        )
-
-    if args.chain_of_thought == "True":
-        output_name = (
-            args.data_output_path
-            + "predict_"
-            + args.mode
-            + "_"
-            + args.engine
-            + "_cot"
-            + "_"
-            + args.sql_dialect
-            + ".json"
-        )
-    else:
-        output_name = (
-            args.data_output_path
-            + "predict_"
-            + args.mode
-            + "_"
-            + args.engine
-            + "_"
-            + args.sql_dialect
-            + ".json"
-        )
-    generate_sql_file(sql_lst=responses, output_path=output_name)
-
-    print(
-        "successfully collect results from {} for {} evaluation; SQL dialect {} Use knowledge: {}; Use COT: {}".format(
-            args.engine,
-            args.mode,
-            args.sql_dialect,
-            args.use_knowledge,
-            args.chain_of_thought,
-        )
-    )
+    main()
