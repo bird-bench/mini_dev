@@ -3,7 +3,7 @@ import argparse
 import multiprocessing as mp
 from func_timeout import func_timeout, FunctionTimedOut
 from evaluation_utils import (
-    load_jsonl,
+    load_json_data,
     execute_sql,
     package_sqls,
     sort_results,
@@ -34,10 +34,10 @@ def execute_model(
     except KeyboardInterrupt:
         sys.exit(0)
     except FunctionTimedOut:
-        result = [(f"timeout",)]
+        result = [("timeout",)]
         res = 0
-    except Exception as e:
-        result = [(f"error",)]  # possibly len(query) > 512 or not executable
+    except Exception:
+        result = [("error",)]  # possibly len(query) > 512 or not executable
         res = 0
     result = {"sql_idx": idx, "res": res}
     return result
@@ -69,7 +69,7 @@ def run_sqls_parallel(
 def compute_acc_by_diff(exec_results, diff_json_path):
     num_queries = len(exec_results)
     results = [res["res"] for res in exec_results]
-    contents = load_jsonl(diff_json_path)
+    contents = load_json_data(diff_json_path)
     simple_results, moderate_results, challenging_results = [], [], []
 
     for i, content in enumerate(contents):

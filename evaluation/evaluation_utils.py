@@ -1,7 +1,20 @@
 import json
+from pathlib import Path
+
 import psycopg2
 import pymysql
 import sqlite3
+
+
+def load_json_data(file_path):
+    file = Path(file_path)
+    if file.suffix == '.json':
+        return load_json(file)
+    elif file.suffix == '.jsonl':
+        return load_jsonl(file)
+    else:
+        raise ValueError('Invalid file type')
+
 
 def load_jsonl(file_path):
     data = []
@@ -9,6 +22,7 @@ def load_jsonl(file_path):
         for line in file:
             data.append(json.loads(line))
     return data
+
 
 def load_json(dir):
     with open(dir, "r") as j:
@@ -29,7 +43,7 @@ def connect_postgresql():
 # PyMySQL  1.1.1
 def connect_mysql():
     # Open database connection
-    # Connect to the database"
+    # Connect to the database
     db = pymysql.connect(
         host="localhost",
         user="root",
@@ -119,6 +133,7 @@ def print_data(score_lists, count_lists, metric="F1 Score",result_log_file=None)
     
      # Log to file in append mode
     if result_log_file is not None:
+        Path(result_log_file).parent.mkdir(parents=True, exist_ok=True)
         with open(result_log_file, "a") as log_file:
             log_file.write(f"start calculate {metric}\n")
             log_file.write("{:20} {:20} {:20} {:20} {:20}\n".format("", *levels))
