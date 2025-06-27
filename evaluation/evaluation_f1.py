@@ -61,8 +61,8 @@ def calculate_f1_score(predicted, ground_truth):
     ground_truth_set = set(ground_truth)
 
     # convert back to list
-    predicted = list(predicted_set)
-    ground_truth = list(ground_truth_set)
+    predicted = list(dict.fromkeys(predicted))
+    ground_truth = list(dict.fromkeys(ground_truth))
 
     # Calculate matching scores for each possible pair
     match_scores = []
@@ -218,9 +218,7 @@ if __name__ == "__main__":
     exec_result = []
 
     pred_queries, db_paths = package_sqls(
-        args.predicted_sql_path,
-        args.db_root_path,
-        mode='pred'
+        args.predicted_sql_path, args.db_root_path, mode="pred"
     )
     # generate ground truth sqls:
     gt_queries, db_paths_gt = package_sqls(
@@ -245,7 +243,9 @@ if __name__ == "__main__":
         exec_result, args.diff_json_path
     )
     score_lists = [simple_acc, moderate_acc, challenging_acc, acc]
-    print_data(score_lists, count_lists,metric='Soft-F1',result_log_file=args.output_log_path)
+    print_data(
+        score_lists, count_lists, metric="Soft-F1", result_log_file=args.output_log_path
+    )
     print(
         "==========================================================================================="
     )
