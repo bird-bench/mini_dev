@@ -24,6 +24,18 @@
 <a><img src="materials/intro.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
 </p>
 
+## Quick Start
+
+1. Use `uv sync` or `conda env create -f environment.yml` to initialize python env.
+2. Run `./scripts/init_dataset.sh` to prepare the dataset.
+3. Run `./script/run_gpt.sh` to generate questions & have the LLM predict SQLs.
+4. Run `./script/run_evaluation.sh` to get all scores;
+
+   To get specific ex/res-v/soft-f1 score, add parms 1/2/3 at the end.
+
+**Important:** Before running all these scripts, remember to modify the **CAP_VARIABLES** to match your env.
+
+---
 
 ## Overview
 Here, we provide a Lite version of developtment dataset: **Mini-Dev**. This mini-dev dataset is designed to facilitate efficient and cost-effective development cycles, especially for testing and refining SQL query generation models. This dataset results from community feedback, leading to the compilation of 500 high-quality text2sql pairs derived from 11 distinct databases in a development environment. To further enhance the practicality of the BIRD system in industry settings and support the development of text-to-SQL models, we make the Mini-Dev dataset available in both **MySQL** and **PostgreSQL**.
