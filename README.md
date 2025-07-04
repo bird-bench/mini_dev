@@ -24,6 +24,36 @@
 <a><img src="materials/intro.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
 </p>
 
+### Update 2025-07-04
+
+We are grateful for the valuable feedback from the community over the past year regarding BIRD Mini-Dev. Based on your suggestions, we have made significant updates to the BIRD Mini-Dev dataset.
+
+We have upload our data to the HuggingFace, please check https://huggingface.co/datasets/birdsql/bird_mini_dev
+
+#### For New Users
+If you are new to BIRD Mini-Dev, you can download the complete databases and datasets using the following link:
+[Download BIRD Mini-Dev Complete Package](https://drive.google.com/file/d/13VLWIwpw5E3d5DUkMvzw7hvHE67a4XkG/view?usp=sharing)
+
+#### For Existing Users
+If you have already downloaded the BIRD databases, you can pull the latest data updates through Hugging Face using the following scripts:
+
+```python
+from datasets import load_dataset
+
+# Load the dataset
+dataset = load_dataset("birdsql/bird_mini_dev")
+
+# Access the SQLite version
+print(dataset["mini_dev_sqlite"][0])
+
+# Access the MySQL version
+print(dataset["mini_dev_mysql"][0])
+
+# Access the PostgreSQL version
+print(dataset["mini_dev_pg"][0])
+```
+
+We appreciate the continuous support and feedback from the community. 
 
 ## Overview
 Here, we provide a Lite version of developtment dataset: **Mini-Dev**. This mini-dev dataset is designed to facilitate efficient and cost-effective development cycles, especially for testing and refining SQL query generation models. This dataset results from community feedback, leading to the compilation of 500 high-quality text2sql pairs derived from 11 distinct databases in a development environment. To further enhance the practicality of the BIRD system in industry settings and support the development of text-to-SQL models, we make the Mini-Dev dataset available in both **MySQL** and **PostgreSQL**.
