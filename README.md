@@ -188,8 +188,8 @@ The main file for ex evaluation is located at [`./llm/src/evaluation_ex.py`](./l
 Then you could evaluate the results by the following command line :
 
 ```bash
-cd ./llm/
-sh ./run/run_evaluation.sh
+cd ./evaluation/
+sh run_evaluation.sh
 ```
 
 ### Reward-based Valid Efficiency Score (R-VES):
@@ -197,8 +197,8 @@ The main file for R-VES evaluation is located at [`./llm/src/evaluation_ves.py`]
 R-VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
 
 ```bash
-cd ./llm/
-sh ./run/run_evaluation.sh
+cd ./evaluation/
+sh run_evaluation.sh
 ```
 (For stable R-VES, you may need to enlarge `timeout` or repeat and average results. In our test evaluation, we will enlarge `timeout` to 3 s/ex; then we repeat 5 times for VES computation, only the highest results will be reported.)
 
@@ -213,8 +213,8 @@ In the latest version, we adjust the VES evaluation to be more stable and reliab
 The main file for Soft F1-Score evaluation is located at [`./llm/src/evaluation_f1.py`](./llm/src/evaluation_f1.py). Soft-F1, VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
 
 ```bash
-cd ./llm/
-sh ./run/run_evaluation.sh
+cd ./evaluation/
+sh run_evaluation.sh
 ```
 #### Soft F1-Score:
 Alongside the update to the Mini-Dev set, we introduced a new evaluation metric—the soft F1-score. This metric is specifically designed to assess the performance of text-to-SQL models by measuring the similarity between the tables produced by predicted SQL queries and those from the ground truth. In a nutshell, the soft F1-score is a more lenient metric that reduces the impact of column order and missing values in the tables produced by predicted SQL queries.
