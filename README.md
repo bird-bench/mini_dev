@@ -24,6 +24,13 @@
 <a><img src="materials/intro.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
 </p>
 
+### Update 2025-07-22
+We are pleased to release a **SQLite version** of **LiveSQLBench-Base-Lite**, extending from PostgreSQL to SQLite dialect to **improve accessibility** as SQLite requires no server setup and runs locally. This release features **18 end-user level databases** with **270** tasks (180 SELECT-only, 90 Management tasks), **HKB-JSON** and **JSON operations in SQL** for trial.
+
+Beyond SQL and test case translation, we **carefully adapted 20+ user queries** to align with SQLite's database engine characteristics. For example, since SQLite doesn't support custom functions, we modified queries to either return specific scenario values or utilize views (e.g., `CREATE VIEW AS ...`) to maintain query complexity while ensuring compatibility.
+
+The detailed usage and evaluation can be found in the [live_sql_bench_sqlite](./live_sql_bench_sqlite) folder. The project website is available at [LiveSQLBench](https://livesqlbench.ai/) and the dataset can be downloaded from [HuggingFace](https://huggingface.co/datasets/birdsql/livesqlbench-base-lite-sqlite).
+
 ### Update 2025-07-04
 
 We are grateful for the valuable feedback from the community over the past year regarding BIRD Mini-Dev. Based on your suggestions, we have made significant updates to the BIRD Mini-Dev dataset.
