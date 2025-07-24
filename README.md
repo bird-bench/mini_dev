@@ -25,26 +25,26 @@
 </p>
 
 ### Update 2025-07-22
-We are pleased to release **BIRD-Mini-Dev V2**, which contains **780 text-to-SQL instances**. Among these, **500 high-quality** SELECT-only instances are carefully selected from the original BIRD-Dev dataset. This summer, we present an additional **270 new instances** featuring both SELECT-only and CRUD operations across **18 new end-user level databases**. These new instances include **HKB-JSON** and **JSON operations in SQL capabilities**, extending from PostgreSQL to SQLite dialect to **improve accessibility**. More details can be found in the [LiveSQLBench](https://livesqlbench.ai/) project website.
+We are pleased to release **BIRD-Mini-Dev V2**, which contains **780 text-to-SQL instances**. Among these, **500 high-quality** SELECT-only instances are carefully selected from the original BIRD-Dev dataset. This summer, we present an additional **270 new instances** featuring both SELECT-only and CRUD operations across **18 new end-user level databases**. These new instances include **HKB-JSON** and **JSON operations in SQL capabilities**, extending from PostgreSQL to SQLite dialect to **improve accessibility**. More details can be found in the [LiveSQLBench](https://livesqlbench.ai/) project website. We are still working on the MySQL version of the Mini-Dev dataset, which will be released in the near future.
 
 > Beyond SQL and test case translation, we **carefully adapted 20+ user queries** to align with SQLite's database engine characteristics. For example, since SQLite doesn't support custom functions, we modified queries to either return specific scenario values or utilize views (e.g., `CREATE VIEW AS ...`) to maintain query complexity while ensuring compatibility.
 
 The detailed usage and evaluation can be found in the [live_sql_bench_sqlite](./live_sql_bench_sqlite) folder. The project website is available at [LiveSQLBench](https://livesqlbench.ai/) and the dataset can be downloaded from [HuggingFace](https://huggingface.co/datasets/birdsql/livesqlbench-base-lite-sqlite).
 
 #### Performance on LiveSQLBench-Base-Lite
-| Model                 | PostgreSQL | SQlite |
-| --------------------- | ---------- | ------ |
-| o3-mini               | 47.78      | 42.59  |
-| Claude 3.7 Sonnet     | 39.26      | 41.11  |
-| GPT-4o                | 34.44      | 34.44  |
-| Gemini 2.0 Flash      | 34.44      | 33.7   |
-| DeepSeek R1-0528      | 38.14      | 32.96  |
-| QwQ-32B               | 31.48      | 31.48  |
-| Qwen2.5 Coder 32B     | 22.96      | 22.22  |
-| Codestral 22B         | 21.11      | 19.63  |
-| Qwen2.5 Coder 7B      | 12.22      | 12.22  |
-| Mixtral 8x7B Instruct | 2.59       | 8.89   |
-| Mistral 7B Instruct   | 3.7        | 4.44   |
+| Model                 | SQLite | PostgreSQL |
+| --------------------- | ------ | ---------- |
+| o3-mini               | 42.59  | 47.78      |
+| Claude 3.7 Sonnet     | 41.11  | 39.26      |
+| GPT-4o                | 34.44  | 34.44      |
+| Gemini 2.0 Flash      | 33.7   | 34.44      |
+| DeepSeek R1-0528      | 32.96  | 38.14      |
+| QwQ-32B               | 31.48  | 31.48      |
+| Qwen2.5 Coder 32B     | 22.22  | 22.96      |
+| Codestral 22B         | 19.63  | 21.11      |
+| Qwen2.5 Coder 7B      | 12.22  | 12.22      |
+| Mixtral 8x7B Instruct | 8.89   | 2.59       |
+| Mistral 7B Instruct   | 4.44   | 3.7        |
 
 
 ### Update 2025-07-04
