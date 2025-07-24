@@ -31,6 +31,22 @@ Beyond SQL and test case translation, we **carefully adapted 20+ user queries** 
 
 The detailed usage and evaluation can be found in the [live_sql_bench_sqlite](./live_sql_bench_sqlite) folder. The project website is available at [LiveSQLBench](https://livesqlbench.ai/) and the dataset can be downloaded from [HuggingFace](https://huggingface.co/datasets/birdsql/livesqlbench-base-lite-sqlite).
 
+#### Performance on LiveSQLBench-Base-Lite
+| Model                 | PostgreSQL | SQlite |
+| --------------------- | ---------- | ------ |
+| o3-mini               | 47.78      | 42.59  |
+| Claude 3.7 Sonnet     | 39.26      | 41.11  |
+| GPT-4o                | 34.44      | 34.44  |
+| Gemini 2.0 Flash      | 34.44      | 33.7   |
+| DeepSeek R1-0528      | 38.14      | 32.96  |
+| QwQ-32B               | 31.48      | 31.48  |
+| Qwen2.5 Coder 32B     | 22.96      | 22.22  |
+| Codestral 22B         | 21.11      | 19.63  |
+| Qwen2.5 Coder 7B      | 12.22      | 12.22  |
+| Mixtral 8x7B Instruct | 2.59       | 8.89   |
+| Mistral 7B Instruct   | 3.7        | 4.44   |
+
+
 ### Update 2025-07-04
 
 We are grateful for the valuable feedback from the community over the past year regarding BIRD Mini-Dev. Based on your suggestions, we have made significant updates to the BIRD Mini-Dev dataset.
