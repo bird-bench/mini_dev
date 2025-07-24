@@ -25,9 +25,9 @@
 </p>
 
 ### Update 2025-07-22
-We are pleased to release a **SQLite version** of **LiveSQLBench-Base-Lite**, extending from PostgreSQL to SQLite dialect to **improve accessibility** as SQLite requires no server setup and runs locally. This release features **18 end-user level databases** with **270** tasks (180 SELECT-only, 90 Management tasks), **HKB-JSON** and **JSON operations in SQL** for trial.
+We are pleased to release **BIRD-Mini-Dev V2**, which contains **780 text-to-SQL instances**. Among these, **500 high-quality** SELECT-only instances are carefully selected from the original BIRD-Dev dataset. This summer, we present an additional **270 new instances** featuring both SELECT-only and CRUD operations across **18 new end-user level databases**. These new instances include **HKB-JSON** and **JSON operations in SQL capabilities**, extending from PostgreSQL to SQLite dialect to **improve accessibility**. More details can be found in the [LiveSQLBench](https://livesqlbench.ai/) project website.
 
-Beyond SQL and test case translation, we **carefully adapted 20+ user queries** to align with SQLite's database engine characteristics. For example, since SQLite doesn't support custom functions, we modified queries to either return specific scenario values or utilize views (e.g., `CREATE VIEW AS ...`) to maintain query complexity while ensuring compatibility.
+> Beyond SQL and test case translation, we **carefully adapted 20+ user queries** to align with SQLite's database engine characteristics. For example, since SQLite doesn't support custom functions, we modified queries to either return specific scenario values or utilize views (e.g., `CREATE VIEW AS ...`) to maintain query complexity while ensuring compatibility.
 
 The detailed usage and evaluation can be found in the [live_sql_bench_sqlite](./live_sql_bench_sqlite) folder. The project website is available at [LiveSQLBench](https://livesqlbench.ai/) and the dataset can be downloaded from [HuggingFace](https://huggingface.co/datasets/birdsql/livesqlbench-base-lite-sqlite).
 
