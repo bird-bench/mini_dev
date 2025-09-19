@@ -192,6 +192,7 @@ First, you need install openai in your python environment by:
 
 ```bash
 conda create -n BIRD python=3.11.5
+conda activate BIRD
 pip install requirements.txt
 ```
 
