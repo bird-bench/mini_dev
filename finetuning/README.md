@@ -1,4 +1,4 @@
-# BIRD-SQL Train — Code README
+# BIRD-SQL Train (Filtered)
 
 This README describes **how to prepare data, train, and run inference** for the [filtered BIRD-SQL Train set](https://huggingface.co/datasets/birdsql/BIRD-SQL-Train).
 
