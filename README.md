@@ -24,6 +24,9 @@
 <a><img src="materials/intro.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
 </p>
 
+### Update 2025-09-19
+We’ve released **bird23-train-filtered**, a high-quality filtered subset of the BIRD train split (6,601/9,428 ≈70%) that works as a drop-in replacement for text-to-SQL finetuning; see the dataset at https://huggingface.co/datasets/birdsql/bird23-train-filtered and example finetuning usage in `./finetuning`.
+
 ### Update 2025-07-22
 We are pleased to release **BIRD-Mini-Dev V2**, which contains **780 text-to-SQL instances**. Among these, **500 high-quality** SELECT-only instances are carefully selected from the original BIRD-Dev dataset. This summer, we present an additional **270 new instances** featuring both SELECT-only and CRUD operations across **18 new end-user level databases**. These new instances include **HKB-JSON** and **JSON operations in SQL capabilities**, extending from PostgreSQL to SQLite dialect to **improve accessibility**. More details can be found in the [LiveSQLBench](https://livesqlbench.ai/) project website. We are still working on the MySQL version of the Mini-Dev V2 dataset, which will be released in the near future.
 
