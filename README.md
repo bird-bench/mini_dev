@@ -355,7 +355,7 @@ For any questions, please contact us by bird.bench23@gmail.com.
 - [x] Implement [`TA-SQL`](https://github.com/quge2023/TA-SQL) as ICL Reasoning Baseline.
 - [ ] Implement more open-source LLMs.
 - [x] Release cleaner dev.json.
-- [ ] Release cleaner train.json.
+- [x] Release cleaner train.json.
 - [ ] BIRD-SQL 2024-2025, a broad new research problem.
 
 ## Citation
