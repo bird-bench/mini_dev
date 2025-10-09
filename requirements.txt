@@ -1,5 +1,0 @@
-func-timeout
-openai
-tqdm
-PyMySQL
-psycopg2-binary
