@@ -5,7 +5,8 @@ meta_time_out=30.0
 # DO NOT CHANGE THIS
 
 # ************************* #
-predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_SQLite.json' # Replace with your predict sql json path
+# predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_SQLite.json' # Replace with your predict sql json path
+predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-turbo__cot_SQLite.json' # Replace with your predict sql json path
 # predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_PostgreSQL.json' # Replace with your predict sql json path
 # predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_MySQL.json' # Replace with your predict sql json path
 
@@ -22,15 +23,16 @@ output_log_path="../eval_result/${base_name}.txt"
 
 case $sql_dialect in
   "SQLite")
-    diff_json_path="../sqlite/mini_dev_sqlite.jsonl"
+    # diff_json_path="../sqlite/mini_dev_sqlite.jsonl"
+    diff_json_path="../sqlite/mini_dev_sqlite.json"
     ground_truth_path="../sqlite/mini_dev_sqlite_gold.sql"
     ;;
   "PostgreSQL")
-    diff_json_path="../postgresql/mini_dev_postgresql.jsonl"
+    diff_json_path="../postgresql/mini_dev_postgresql.json"
     ground_truth_path="../postgresql/mini_dev_postgresql_gold.sql"
     ;;
   "MySQL")
-    diff_json_path="../mysql/mini_dev_mysql.jsonl"
+    diff_json_path="../mysql/mini_dev_mysql.json"
     ground_truth_path="../mysql/mini_dev_mysql_gold.sql"
     ;;
   *)
