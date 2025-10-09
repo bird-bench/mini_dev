@@ -1,0 +1,83 @@
+# pyproject.toml
+# -----------------------------------------------------------------------------
+# Purpose:
+#   Single source of truth for dependencies and project metadata.
+#   Managed with `uv` (https://github.com/astral-sh/uv).
+#
+# Quickstart:
+#   uv venv .venv                 # create venv in .venv
+#   source .venv/bin/activate     # activate (Linux/macOS); on Windows: .venv\Scripts\activate
+#   uv lock                       # resolve + write uv.lock (the lockfile)
+#   uv sync                       # install exactly what's in uv.lock
+#
+# Daily use:
+#   uv add <pkg>                  # add a runtime dependency (updates this file + lock)
+#   uv remove <pkg>               # remove a dependency
+#   uv add -d <pkg>               # add a dev-only dependency
+#   uv sync                       # ensure venv matches lock
+#
+# Reproducible installs (CI, prod):
+#   uv sync --frozen              # fail if pyproject and uv.lock are out of sync
+#
+# Upgrades:
+#   uv lock --upgrade             # refresh all versions within constraints
+#   uv lock --upgrade-package <pkg>
+#
+# Export (if someone insists on requirements.txt):
+#   uv export --format requirements-txt > requirements.txt
+#
+# Lint your deps (optional, see dev-dependencies below):
+#   deptry .                      # detect missing/unused deps vs imports
+#   pip-audit                     # check known vulnerabilities
+# -----------------------------------------------------------------------------
+
+[project]
+name = "mini-dev"                # Package name (can be anything; used by tools)
+version = "0.1.0"                # Bump as you like; not critical unless publishing
+description = "Eval harness + DB clients + OpenAI requests"
+readme = "README.md"
+requires-python = ">=3.10"       # Match your runtime (3.12+ also fine)
+
+# Runtime deps (imported by your code)
+dependencies = [
+  "func-timeout",
+  "openai",
+  "tqdm",
+  "PyMySQL",
+  "psycopg2-binary",
+]
+
+# If you later want optional extras (e.g., "dev-db" or "viz"), you can add:
+# [project.optional-dependencies]
+# dev-db = ["sqlalchemy", "alembic"]
+# viz = ["matplotlib"]
+
+# If/when you decide to publish a wheel, add a build backend:
+# [build-system]
+# requires = ["hatchling>=1.25"]
+# build-backend = "hatchling.build"
+
+[tool.uv]
+# Dev-only deps (not needed in production runtime)
+dev-dependencies = [
+  "deptry",       # flags missing/unused imports vs pyproject deps
+  "pip-audit",    # vulnerability scans
+]
+
+# Optional: pin an index or mirror (commented out by default)
+# index-url = "https://pypi.org/simple"
+# extra-index-urls = ["https://your.company/simple"]
+
+# Optional: scripts helper (lets you run `uv run <alias>`)
+# [tool.uv.scripts]
+# depcheck = "deptry ."
+# audit = "pip-audit"
+# test = "pytest -q"
+
+# -----------------------------------------------------------------------------
+# Workflow notes:
+# - Do NOT hand-edit a separate requirements.txt. Use `uv add/remove` and `uv lock`.
+# - Commit BOTH pyproject.toml and uv.lock for reproducible installs.
+# - If you change imports and forget to add a dep, `deptry .` will catch it.
+# - If you need system libpq instead of wheels, swap psycopg2-binary -> psycopg2.
+# -----------------------------------------------------------------------------

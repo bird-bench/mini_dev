@@ -1,1 +1,5 @@
 .DS_Store
+minidev/
+exp_result/
+__pycache__/
+eval_result/
