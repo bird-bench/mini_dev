@@ -57,7 +57,11 @@ We are grateful for the valuable feedback from the community over the past year 
 We have upload our data to the HuggingFace, please check https://huggingface.co/datasets/birdsql/bird_mini_dev
 
 #### For New Users
-If you are new to BIRD Mini-Dev, you can download the complete databases and datasets using the following link:
+
+If you are new to BIRD Mini-Dev, please download the complete databases and datasets from Hugging Face, which should be treated as the canonical version:
+[Download BIRD Mini-Dev from Hugging Face](https://huggingface.co/datasets/birdsql/bird_mini_dev)
+
+You may also refer to the following package link for corresponding database files:
 [Download BIRD Mini-Dev Complete Package](https://drive.google.com/file/d/13VLWIwpw5E3d5DUkMvzw7hvHE67a4XkG/view?usp=sharing)
 
 #### For Existing Users
