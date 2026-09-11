@@ -299,6 +299,7 @@ The soft F1-score is calculated as follows:
 | **gpt-4**        | 47.80  | 40.80 | 35.80      |
 | **TA + gpt-4-turbo**        | 58.00  | - | -      |
 | **TA + gpt-4o**        | 63.00  | - | -      |
+| **[Glimta + claude-opus-5](https://github.com/charliefrantowski/bird-minidev-glimta)** (one attempt) | 88.20  | - | -      |
 
 
 ### R-VES Evaluation
@@ -317,6 +318,7 @@ The soft F1-score is calculated as follows:
 | **gpt-4**        | 45.91  | 39.92 | 35.24       |
 | **TA + gpt-4-turbo**        | 56.44   | - | -      |
 | **TA + gpt-4o**        | 60.86  | - | -      |
+| **[Glimta + claude-opus-5](https://github.com/charliefrantowski/bird-minidev-glimta)** (one attempt) | 81.61  | - | -      |
 
 
 ### Soft F1-Score Evaluation
@@ -335,6 +337,7 @@ The soft F1-score is calculated as follows:
 | **gpt-4**        | 52.69 | 45.78 | 38.96       |
 | **TA + gpt-4-turbo**        | 62.40   | - | -      |
 | **TA + gpt-4o**        | 66.97  | - | -      |
+| **[Glimta + claude-opus-5](https://github.com/charliefrantowski/bird-minidev-glimta)** (one attempt) | 90.03  | - | -      |
 
 ### Predict SQLs
 We drop the predicted SQLs of baseline models under `./llm/exp_result/sql_output_kg/` for reference.
