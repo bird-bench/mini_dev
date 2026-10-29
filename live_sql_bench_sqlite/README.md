@@ -49,7 +49,7 @@ After you generate SQL queries using the prompts, you can use the following scri
 cd utils
 input_path="xxx/generated_sql.jsonl" # Replace with your generated SQL file path
 output_path="xxx/post_processed_sql.jsonl" # Replace with your desired output path
-python xxx/post_process_baseline.py --input_path $input_path --output_path $output_path
+python xxx/post_process.py --input_path $input_path --output_path $output_path
 ```
 
 ## 📊 Evaluation
