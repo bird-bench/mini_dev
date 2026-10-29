@@ -24,6 +24,14 @@
 <a><img src="materials/intro.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
 </p>
 
+### Update 2026-10-28
+
+We have released the **2026 update to BIRD Mini-Dev**! Following community feedback and a human-in-the-loop review, we corrected annotations and replaced selected instances across **SQLite, MySQL, and PostgreSQL**.
+
+Updated data and baseline results are available on [**Hugging Face**](https://huggingface.co/datasets/birdsql/bird_mini_dev), with **Harbor-format tasks** available on [**Harbor Hub**](https://hub.harborframework.com/datasets/birdsql/bird-mini-dev).
+
+We sincerely thank the **NVIDIA researchers**, **Thinking Machines Lab**, and the community for their valuable feedback and contributions!
+
 ### Update 2025-09-19
 We’ve released **bird23-train-filtered**, a high-quality filtered subset of the BIRD train split (6,601/9,428 ≈70%) that works as a drop-in replacement for text-to-SQL finetuning; see the dataset at https://huggingface.co/datasets/birdsql/bird23-train-filtered and example finetuning usage in `./finetuning`.
 
