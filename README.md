@@ -220,6 +220,8 @@ sh ./run/run_gpt.sh
 
 ## Evaluation:
 
+- [EvalScope](https://github.com/modelscope/evalscope) supports the BIRD Mini-Dev SQLite split with execution accuracy. See the [usage guide](https://evalscope.readthedocs.io/en/latest/benchmarks/bird_sql.html) for setup and model endpoint examples.
+
 ### Execution (EX) Evaluation:
 
 Please post-process your collected results as the format: SQL and its `db_id`, which is splitted by `'\t----- bird -----\t'`. The examples are shown in the [`./llm/exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json`](./llm/exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json). Put the ground-truth sql file in the [`./data/`](./data/). And you may need to design a ChatGPT tag by your own.
